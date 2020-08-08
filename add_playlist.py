@@ -2,10 +2,6 @@ import discord
 from discord.ext import commands
 
 TOKEN = "put the bot's token here"
-help_msg = ("""!create url/words, you can pass words or url to add to your playlist
- \n!clear url/words, you can pass a url or words to remove it from your playlist or if nothing was passed with clear it will clear your whole playlist
- \n!playme user, use it to play a user playlist or pass it alone to play yours
-  \n!playlist will send all users songs one by one and it may take time!""")
 client = discord.Client()
 playlists = {}
 @client.event
@@ -18,13 +14,15 @@ async def on_message(message):
         playlists.setdefault(author,[])
         playlists[author].append(play)
         await message.channel.send(f'Done! {author} uwu ')
-    if message.content.startswith('!playlist'):
+     if message.content.startswith('!playlist'):
         for users in playlists:
             user = ""
-            await message.channel.send(f"{users}'s playlist:")
+            embed = discord.Embed(colour = discord.Colour.red())
+            embed.set_author(name=f"{users}'s playlist")
             for playlist in playlists[users]:
                 user = user+' \n '+playlist
-            await message.channel.send(f'{user}')
+            embed.add_field(name=f'{user}',value='',inline=False)
+            await message.channel.send(embed=embed)
     if message.content.startswith('!clear'):
         play= (message.content).replace('!clear','')
         if len(play) > 0:
@@ -50,8 +48,14 @@ async def on_message(message):
             for songs in playlists[author]:
                 await message.channel.send(f'!play {songs}')
     if message.content.startswith('!playhelp'):
-        await message.channel.send(help_msg)
-
+        embed = discord.Embed(
+        colour = discord.Colour.green())
+        embed.set_author(name='!playhelp : lsit of all the available commands')
+        embed.add_field(name='!playme',value ='use it with username to play a user playlist or pass it empty to play yours',inline=False)
+        embed.add_field(name='!clear',value ='you can pass a url or words to get it removed from your playlist or if nothing was passed with clear it will clear your whole playlist',inline=False)
+        embed.add_field(name='!create',value ='you can pass words or a url to add stuff to your playlist',inline=False)
+        embed.add_field(name='!playlist',value ='will return all the users playlist',inline=False)
+        await message.channel.send(embed=embed)
 
 @client.event
 async def on_ready():
